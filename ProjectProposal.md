@@ -1,4 +1,4 @@
-# Project Proposal
+# Project Proposal 
 
 ### Background
 We want to build the board game Mancala. In this game:
