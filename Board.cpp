@@ -1,16 +1,23 @@
 #include "Board.hpp"
-#include "Pebble.hpp"
-#include <ncurses.h>
+// #include <ncurses.h>
 #include <iostream>
 
-Board::Board() {
+Board::Board()
+{
+    std::vector<std::vector<std::unique_ptr<Pebble>>> board;
+
     // Initialize the board with 4 pebbles in each pocket
-    for (int i = 0; i < 12; ++i) {
-        std::vector<Pebble*> pocket;
-        for (int j = 0; j < 4; ++j) {
-            pocket.push_back(new Pebble(1, 1)); // TODO: Randomize colors & sizes
+    for (int i = 0; i <= 13; ++i)
+    {
+        std::vector<std::unique_ptr<Pebble>> pocket;
+        for (int j = 0; j < 4; ++j)
+        {
+            int randomColor = 1; /* Generate a random color */
+            int randomSize = 1;  /* Generate a random size */
+
+            pocket.push_back(std::make_unique<Pebble>(randomSize, randomColor));
         }
-        board.push_back(pocket);
+        board.push_back(std::move(pocket));
     }
 
     // Initialize scores and game state
@@ -20,32 +27,42 @@ Board::Board() {
     isGameOver = std::make_unique<bool>(false);
 }
 
-bool Board::move(int pocketIndex) {
+bool Board::move(int pocketIndex)
+{
     // Validate the selected pocket index
-    if (*isGameOver || pocketIndex < 0 || pocketIndex >= 14 || board[pocketIndex].empty() || pocketIndex == 6 || pocketIndex == 13) {
+    if (!isGameOver || !currentPlayer || pocketIndex < 0 || pocketIndex >= 14 ||
+        board[pocketIndex].empty() || isStore(pocketIndex))
+    {
         return false;
     }
 
-    std::vector<Pebble*> hand;
+    // Grab pebbles from pocket
+    std::vector<std::unique_ptr<Pebble>> hand;
     hand.swap(board[pocketIndex]);
 
     int currentIndex = pocketIndex;
-    while (!hand.empty()) {
+    while (!hand.empty())
+    {
         // Move to next pocket
+        // currentIndex = getNextPocketIndex(currentIndex);
         currentIndex = (currentIndex + 1) % 14;
 
         // Skip opponent's store
-        if ((currentIndex == 13 && *currentPlayer == 0) || (currentIndex == 6 && *currentPlayer == 1)) {
+        // if (isOpponentsStore(currentIndex, *currentPlayer))
+        if ((currentIndex == 13 && *currentPlayer == 0) || (currentIndex == 6 && *currentPlayer == 1))
+        {
             continue;
         }
 
         // Place one pebble in the current pocket or store
-        board[currentIndex].push_back(hand.back());
+        board[currentIndex].push_back(std::move(hand.back()));
         hand.pop_back();
     }
 
     // Switch current player if the last pebble did not land in the player's store
-    if ((currentIndex != 6 || *currentPlayer != 0) && (currentIndex != 13 || *currentPlayer != 1)) {
+    // if (!isPlayersStore(currentIndex, *currentPlayer))
+    if ((currentIndex != 6 || *currentPlayer != 0) && (currentIndex != 13 || *currentPlayer != 1))
+    {
         *currentPlayer = (*currentPlayer + 1) % 2;
     }
 
@@ -55,53 +72,71 @@ bool Board::move(int pocketIndex) {
     return true;
 }
 
-
-bool Board::checkVictory() {
+bool Board::checkVictory()
+{
     // Check if all pockets on one side are empty
     bool side0Empty = true, side1Empty = true;
-    for (int i = 0; i < 6; ++i) { 
-        if (!board[i].empty()) {
+    for (int i = 0; i < 6; ++i)
+    {
+        if (!board[i].empty())
+        {
             side0Empty = false;
             break;
         }
     }
-    for (int i = 7; i < 13; ++i) { 
-        if (!board[i].empty()) {
+    for (int i = 7; i < 13; ++i)
+    {
+        if (!board[i].empty())
+        {
             side1Empty = false;
             break;
         }
     }
 
-    if (side0Empty || side1Empty) {
+    if (side0Empty || side1Empty)
+    {
         *score0 = board[6].size();
         *score1 = board[13].size();
 
-        if (*score0 > *score1) {
+        if (*score0 > *score1)
+        {
             winner = std::make_unique<int>(0);
-        } else if (*score1 > *score0) {
+        }
+        else if (*score1 > *score0)
+        {
             winner = std::make_unique<int>(1);
-        } else {
+        }
+        else
+        {
             winner = std::make_unique<int>(-1); // A tie
         }
 
         *isGameOver = true;
         return *isGameOver;
     }
+
+    return false;
 }
 
-void Board::print() {
+void Board::print()
+{
     // Player 0
     std::cout << "Player 0 Pockets: ";
-    for (int i = 0; i < 6; ++i) {
+    for (int i = 0; i < 6; ++i)
+    {
         std::cout << board[i].size() << " ";
     }
     std::cout << "\nPlayer 0 Store: " << board[6].size() << std::endl;
 
     // Player 1
     std::cout << "Player 1 Pockets: ";
-    for (int i = 7; i < 13; ++i) {
+    for (int i = 7; i < 13; ++i)
+    {
         std::cout << board[i].size() << " ";
     }
     std::cout << "\nPlayer 1 Store: " << board[13].size() << std::endl;
 }
 
+bool Board::isStore(int pocketIndex) {
+    return pocketIndex == 6 || pocketIndex == 13;
+}

@@ -10,6 +10,7 @@ private:
 
 public:
     Pebble(int color, int size);
+    // ~Pebble();
 
     int getColor() const { return color; }
     int getSize() const { return size; }
