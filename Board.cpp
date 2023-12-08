@@ -121,7 +121,7 @@ bool Board::checkVictory()
     return false;
 }
 
-std::string formatPebbles(int i, bool isStore = false)
+std::string formatPrint(int i, bool isStore = false)
 {
     if (isStore)
         return i < 10 ? std::to_string(i) + " " : std::to_string(i);
@@ -150,24 +150,24 @@ void Board::print()
     // I stole from https://ascii.co.uk/art/mancala
     std::cout << "__________________________________________________________________" << std::endl;
     std::cout << "/  ____     ____    ____    ____    ____    ____    ____          \\" << std::endl;
-    std::cout << "/ |    |   [_" << formatPebbles(board[7].size())
-              << "_]  [_" << formatPebbles(board[8].size())
-              << "_]  [_" << formatPebbles(board[9].size())
-              << "_]  [_" << formatPebbles(board[10].size())
-              << "_]  [_" << formatPebbles(board[11].size())
-              << "_]  [_" << formatPebbles(board[12].size())
+    std::cout << "/ |    |   [_" << formatPrint(board[7].size())
+              << "_]  [_" << formatPrint(board[8].size())
+              << "_]  [_" << formatPrint(board[9].size())
+              << "_]  [_" << formatPrint(board[10].size())
+              << "_]  [_" << formatPrint(board[11].size())
+              << "_]  [_" << formatPrint(board[12].size())
               << "_]   ____  \\" << std::endl;
-    std::cout << "/ | " << formatPebbles(board[13].size(), true)
+    std::cout << "/ | " << formatPrint(board[13].size(), true)
               << " |                                                   |    | \\" << std::endl;
     std::cout << "/ |____|    ____    ____    ____    ____    ____    ____   | "
-              << formatPebbles(board[6].size(), true)
+              << formatPrint(board[6].size(), true)
               << " | \\" << std::endl;
-    std::cout << "/          [_" << formatPebbles(board[0].size())
-              << "_]  [_" << formatPebbles(board[1].size())
-              << "_]  [_" << formatPebbles(board[2].size())
-              << "_]  [_" << formatPebbles(board[3].size())
-              << "_]  [_" << formatPebbles(board[4].size())
-              << "_]  [_" << formatPebbles(board[5].size())
+    std::cout << "/          [_" << formatPrint(board[0].size())
+              << "_]  [_" << formatPrint(board[1].size())
+              << "_]  [_" << formatPrint(board[2].size())
+              << "_]  [_" << formatPrint(board[3].size())
+              << "_]  [_" << formatPrint(board[4].size())
+              << "_]  [_" << formatPrint(board[5].size())
               << "_]  |____| \\" << std::endl;
     std::cout << "/_________________________________________________________________\\" << std::endl;
 }
