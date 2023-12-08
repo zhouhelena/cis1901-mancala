@@ -4,12 +4,15 @@
 
 Board::Board()
 {
-    std::vector<std::vector<std::unique_ptr<Pebble>>> board;
-
     // Initialize the board with 4 pebbles in each pocket
     for (int i = 0; i <= 13; ++i)
     {
         std::vector<std::unique_ptr<Pebble>> pocket;
+        if (i == 6 || i == 13) // Skip player 0 & 1's store
+        {
+            board.push_back(std::move(pocket));
+            continue;
+        }
         for (int j = 0; j < 4; ++j)
         {
             int randomColor = 1; /* Generate a random color */
@@ -118,6 +121,13 @@ bool Board::checkVictory()
     return false;
 }
 
+std::string formatPebbles(int i, bool isStore = false)
+{
+    if (isStore)
+        return i < 10 ? std::to_string(i) + " " : std::to_string(i);
+    return i < 10 ? std::to_string(i) + "_" : std::to_string(i);
+}
+
 void Board::print()
 {
     // Player 0
@@ -135,8 +145,34 @@ void Board::print()
         std::cout << board[i].size() << " ";
     }
     std::cout << "\nPlayer 1 Store: " << board[13].size() << std::endl;
+
+    // Visual representation
+    // I stole from https://ascii.co.uk/art/mancala
+    std::cout << "__________________________________________________________________" << std::endl;
+    std::cout << "/  ____     ____    ____    ____    ____    ____    ____          \\" << std::endl;
+    std::cout << "/ |    |   [_" << formatPebbles(board[7].size())
+              << "_]  [_" << formatPebbles(board[8].size())
+              << "_]  [_" << formatPebbles(board[9].size())
+              << "_]  [_" << formatPebbles(board[10].size())
+              << "_]  [_" << formatPebbles(board[11].size())
+              << "_]  [_" << formatPebbles(board[12].size())
+              << "_]   ____  \\" << std::endl;
+    std::cout << "/ | " << formatPebbles(board[13].size(), true)
+              << " |                                                   |    | \\" << std::endl;
+    std::cout << "/ |____|    ____    ____    ____    ____    ____    ____   | "
+              << formatPebbles(board[6].size(), true)
+              << " | \\" << std::endl;
+    std::cout << "/          [_" << formatPebbles(board[0].size())
+              << "_]  [_" << formatPebbles(board[1].size())
+              << "_]  [_" << formatPebbles(board[2].size())
+              << "_]  [_" << formatPebbles(board[3].size())
+              << "_]  [_" << formatPebbles(board[4].size())
+              << "_]  [_" << formatPebbles(board[5].size())
+              << "_]  |____| \\" << std::endl;
+    std::cout << "/_________________________________________________________________\\" << std::endl;
 }
 
-bool Board::isStore(int pocketIndex) {
+bool Board::isStore(int pocketIndex)
+{
     return pocketIndex == 6 || pocketIndex == 13;
 }
