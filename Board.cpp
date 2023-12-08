@@ -169,10 +169,20 @@ void Board::print()
               << "_]  [_" << formatPrint(board[4].size())
               << "_]  [_" << formatPrint(board[5].size())
               << "_]  |____| \\" << std::endl;
-    std::cout << "/_________________________________________________________________\\" << std::endl;
+    std::cout << "/_________________________________________________________________\\\n" << std::endl;
 }
 
 bool Board::isStore(int pocketIndex)
 {
     return pocketIndex == 6 || pocketIndex == 13;
+}
+
+void Board::printCurrPlayer()
+{
+    std::cout << "Player " << *currentPlayer << "'s turn: " << std::endl;    
+}
+
+int Board::countPebbles(int pocketIndex)
+{
+    return board[pocketIndex].size();
 }

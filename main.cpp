@@ -16,4 +16,9 @@ int main(void)
     }
 
     board.print();
+    board.printCurrPlayer();
+
+    board.move(1);
+    board.print();
+    board.printCurrPlayer();
 }

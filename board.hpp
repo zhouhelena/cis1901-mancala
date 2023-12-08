@@ -21,11 +21,16 @@ private:
 
 public:
     Board();
-    // ~Board();
+    // TODO: implement destructor
+    // ~Board() = default;
 
     bool move(int pocketIndex);
     bool checkVictory();
     void print();
+    void printCurrPlayer();
+
+    // helpers
+    int countPebbles(int pocketIndex);
 };
 
 #endif

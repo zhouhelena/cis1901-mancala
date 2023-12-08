@@ -1,2 +1,2 @@
-main: main.cpp Board.cpp Pebble.cpp
-	g++ main.cpp Board.cpp Pebble.cpp -lmenu -lncurses -o main
+main: main.cpp Board.cpp Pebble.cpp computer.cpp
+	g++ main.cpp Board.cpp Pebble.cpp computer.cpp -lmenu -lncurses -o main
