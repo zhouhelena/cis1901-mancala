@@ -39,6 +39,16 @@ bool Board::move(int pocketIndex)
         return false;
     }
 
+    if (*currentPlayer == 0 && pocketIndex >= 6)
+    {
+        return false;
+    }
+
+    if (*currentPlayer == 1 && pocketIndex < 7)
+    {
+        return false;
+    }
+
     // Grab pebbles from pocket
     std::vector<std::unique_ptr<Pebble>> hand;
     hand.swap(board[pocketIndex]);
@@ -47,11 +57,9 @@ bool Board::move(int pocketIndex)
     while (!hand.empty())
     {
         // Move to next pocket
-        // currentIndex = getNextPocketIndex(currentIndex);
         currentIndex = (currentIndex + 1) % 14;
 
         // Skip opponent's store
-        // if (isOpponentsStore(currentIndex, *currentPlayer))
         if ((currentIndex == 13 && *currentPlayer == 0) || (currentIndex == 6 && *currentPlayer == 1))
         {
             continue;
@@ -63,7 +71,6 @@ bool Board::move(int pocketIndex)
     }
 
     // Switch current player if the last pebble did not land in the player's store
-    // if (!isPlayersStore(currentIndex, *currentPlayer))
     if ((currentIndex != 6 || *currentPlayer != 0) && (currentIndex != 13 || *currentPlayer != 1))
     {
         *currentPlayer = (*currentPlayer + 1) % 2;

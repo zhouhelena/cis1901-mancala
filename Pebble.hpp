@@ -1,8 +1,6 @@
 #ifndef PEBBLE_HPP
 #define PEBBLE_HPP
 
-#include <ncurses.h>
-
 class Pebble {
 private:
     int color; 
