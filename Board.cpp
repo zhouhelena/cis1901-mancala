@@ -1,5 +1,4 @@
 #include "Board.hpp"
-// #include <ncurses.h>
 #include <iostream>
 
 Board::Board()
