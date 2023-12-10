@@ -9,10 +9,10 @@ int getPocketIndex(int x, int y);
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Mancala");
+    sf::RenderWindow window(sf::VideoMode(820, 600), "Mancala");
     Board board;
 
-    sf::RectangleShape boardShape(sf::Vector2f(760, 260));
+    sf::RectangleShape boardShape(sf::Vector2f(780, 230));
     boardShape.setPosition(20, 170);
     boardShape.setFillColor(sf::Color(139, 69, 19));
 
@@ -30,11 +30,11 @@ int main()
         }
         else if (i < 6)
         { // Bottom row
-            pockets[i].setPosition(120.f + i * 100, 300.f);
+            pockets[i].setPosition(130.f + i * 100, 300.f);
         }
         else if (i < 13)
         { // Top row
-            pockets[i].setPosition(120.f + (i - 7) * 100, 200.f);
+            pockets[i].setPosition(130.f + (i - 7) * 100, 200.f);
         }
     }
 
@@ -45,18 +45,19 @@ int main()
         {
             if (event.type == sf::Event::Closed)
                 window.close();
-        }
+        
 
-        if (event.type == sf::Event::MouseButtonPressed)
-        {
-            if (event.mouseButton.button == sf::Mouse::Left)
+            if (event.type == sf::Event::MouseButtonPressed)
             {
-                int pocketIndex = getPocketIndex(event.mouseButton.x, event.mouseButton.y);
-                if (board.canMove(pocketIndex))
+                if (event.mouseButton.button == sf::Mouse::Left)
                 {
-                    board.move(pocketIndex);
-                    std::cout << "Picked pocket" << std::endl;
-                    // TODO: Add code to update GUI
+                    int pocketIndex = getPocketIndex(event.mouseButton.x, event.mouseButton.y);
+                    if (board.canMove(pocketIndex))
+                    {
+                        board.move(pocketIndex);
+                        std::cout << "Picked pocket " << pocketIndex << std::endl;
+                        // TODO: Add code to update GUI
+                    }
                 }
             }
         }
@@ -77,25 +78,33 @@ int main()
 
 int getPocketIndex(int x, int y)
 {
-    const float radius = 30.f;
-    const sf::Vector2f offset(120.f, 200.f); 
-    const sf::Vector2f bottomRowOffset(120.f, 300.f); 
-    const sf::Vector2f storeOffset(40.f, 250.f); 
+    const float radius = 50.f;
+    const float diameter = 2 * radius;
+    sf::Vector2f offset(130.f + radius, 200.f + radius); 
+    sf::Vector2f bottomRowOffset(130.f + radius, 300.f + radius); 
+    sf::Vector2f storeOffset(40.f + radius, 250.f + radius); 
 
     // Check top row (7-12)
     for (int i = 7; i < 13; ++i)
     {
-        sf::Vector2f pocketCenter = offset + sf::Vector2f((i - 7) * 100, 0.f);
-        if (std::hypot(pocketCenter.x - x, pocketCenter.y - y) <= radius)
+        sf::Vector2f pocketCenter = offset + sf::Vector2f((12 - i) * diameter, 0.f);
+        // std::cout << "Checking pocket " << i << " at (" << pocketCenter.x << ", " << pocketCenter.y << ") against click (" << x << ", " << y << ")" << std::endl;
+        if (std::hypot(pocketCenter.x - x, pocketCenter.y - y) <= radius) 
+        {
+            std::cout << "Returned pocket " << i << std::endl;
             return i;
+        }
     }
 
     // Check bottom row (0-5)
     for (int i = 0; i < 6; ++i)
     {
-        sf::Vector2f pocketCenter = bottomRowOffset + sf::Vector2f(i * 100, 0.f);
+        sf::Vector2f pocketCenter = bottomRowOffset + sf::Vector2f(i * diameter, 0.f);
         if (std::hypot(pocketCenter.x - x, pocketCenter.y - y) <= radius)
+        {
+            std::cout << "Returned pocket " << i << std::endl;
             return i;
+        }
     }
 
     // Check Player 0's store (6)
