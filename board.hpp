@@ -24,6 +24,7 @@ public:
     // TODO: implement destructor
     // ~Board() = default;
 
+    bool canMove(int pocketIndex);
     bool move(int pocketIndex);
     bool checkVictory();
     void print();

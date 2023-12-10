@@ -31,12 +31,8 @@ Board::Board()
 
 bool Board::move(int pocketIndex)
 {
-    // Validate the selected pocket index
-    if (!isGameOver || !currentPlayer || pocketIndex < 0 || pocketIndex >= 14 ||
-        board[pocketIndex].empty() || isStore(pocketIndex))
-    {
+    if (!canMove(pocketIndex))
         return false;
-    }
 
     if (*currentPlayer == 0 && pocketIndex >= 6)
     {
@@ -60,13 +56,44 @@ bool Board::move(int pocketIndex)
 
         // Skip opponent's store
         if ((currentIndex == 13 && *currentPlayer == 0) || (currentIndex == 6 && *currentPlayer == 1))
-        {
             continue;
-        }
 
         // Place one pebble in the current pocket or store
         board[currentIndex].push_back(std::move(hand.back()));
         hand.pop_back();
+
+        if (hand.empty())
+        {
+            // If the last pebble lands in an empty pocket on the player's side
+            // and the opposite pocket is not empty, capture both pebbles and
+            // place them in the player's store
+            if (board[currentIndex].size() == 1 && !isStore(currentIndex) && !board[12 - currentIndex].empty())
+            {
+                // Grab pebbles from opposite pocket
+                std::vector<std::unique_ptr<Pebble>> oppositePebbles;
+                oppositePebbles.swap(board[12 - currentIndex]);
+
+                // Place pebbles in player's store
+                if (*currentPlayer == 0)
+                {
+                    for (int i = 0; i < oppositePebbles.size(); ++i)
+                        board[6].push_back(std::move(oppositePebbles[i]));
+
+                    hand.clear();
+                    hand.swap(board[currentIndex]);
+                    board[6].push_back(std::move(board[currentIndex].back()));
+                }
+                else
+                {
+                    for (int i = 0; i < oppositePebbles.size(); ++i)
+                        board[13].push_back(std::move(oppositePebbles[i]));
+
+                    hand.clear();
+                    hand.swap(board[currentIndex]);
+                    board[13].push_back(std::move(board[currentIndex].back()));
+                }
+            }
+        }
     }
 
     // Switch current player if the last pebble did not land in the player's store
@@ -77,6 +104,26 @@ bool Board::move(int pocketIndex)
 
     // Check if game over
     *isGameOver = checkVictory();
+
+    return true;
+}
+
+bool Board::canMove(int pocketIndex)
+{
+    if (pocketIndex < 0 || pocketIndex >= 14)
+        return false;
+
+    if (isStore(pocketIndex))
+        return false;
+
+    if (board[pocketIndex].empty())
+        return false;
+
+    if (*currentPlayer == 0 && pocketIndex > 5)
+        return false;
+
+    if (*currentPlayer == 1 && pocketIndex < 7)
+        return false;
 
     return true;
 }
@@ -137,31 +184,27 @@ std::string formatPrint(int i, bool isStore = false)
 void Board::print()
 {
     // Player 0
-    std::cout << "Player 0 Pockets: ";
-    for (int i = 0; i < 6; ++i)
-    {
-        std::cout << board[i].size() << " ";
-    }
-    std::cout << "\nPlayer 0 Store: " << board[6].size() << std::endl;
+    // std::cout << "Player 0 Pockets: ";
+    // for (int i = 0; i < 6; ++i)
+    //     std::cout << board[i].size() << " ";
+    // std::cout << "\nPlayer 0 Store: " << board[6].size() << std::endl;
 
     // Player 1
-    std::cout << "Player 1 Pockets: ";
-    for (int i = 7; i < 13; ++i)
-    {
-        std::cout << board[i].size() << " ";
-    }
-    std::cout << "\nPlayer 1 Store: " << board[13].size() << std::endl;
+    // std::cout << "Player 1 Pockets: ";
+    // for (int i = 7; i < 13; ++i)
+    //     std::cout << board[i].size() << " ";
+    // std::cout << "\nPlayer 1 Store: " << board[13].size() << std::endl;
 
     // Visual representation
     // I stole from https://ascii.co.uk/art/mancala
     std::cout << "__________________________________________________________________" << std::endl;
     std::cout << "/  ____     ____    ____    ____    ____    ____    ____          \\" << std::endl;
-    std::cout << "/ |    |   [_" << formatPrint(board[7].size())
-              << "_]  [_" << formatPrint(board[8].size())
-              << "_]  [_" << formatPrint(board[9].size())
-              << "_]  [_" << formatPrint(board[10].size())
+    std::cout << "/ |    |   [_" << formatPrint(board[12].size())
               << "_]  [_" << formatPrint(board[11].size())
-              << "_]  [_" << formatPrint(board[12].size())
+              << "_]  [_" << formatPrint(board[10].size())
+              << "_]  [_" << formatPrint(board[9].size())
+              << "_]  [_" << formatPrint(board[8].size())
+              << "_]  [_" << formatPrint(board[7].size())
               << "_]   ____  \\" << std::endl;
     std::cout << "/ | " << formatPrint(board[13].size(), true)
               << " |                                                   |    | \\" << std::endl;
@@ -175,7 +218,8 @@ void Board::print()
               << "_]  [_" << formatPrint(board[4].size())
               << "_]  [_" << formatPrint(board[5].size())
               << "_]  |____| \\" << std::endl;
-    std::cout << "/_________________________________________________________________\\\n" << std::endl;
+    std::cout << "/_________________________________________________________________\\\n"
+              << std::endl;
 }
 
 bool Board::isStore(int pocketIndex)
@@ -185,7 +229,7 @@ bool Board::isStore(int pocketIndex)
 
 void Board::printCurrPlayer()
 {
-    std::cout << "Player " << *currentPlayer << "'s turn: " << std::endl;    
+    std::cout << "Player " << *currentPlayer << "'s turn: " << std::endl;
 }
 
 int Board::countPebbles(int pocketIndex)
