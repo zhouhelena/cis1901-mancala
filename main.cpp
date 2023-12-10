@@ -16,13 +16,11 @@ int main()
     boardShape.setPosition(20, 170);
     boardShape.setFillColor(sf::Color(139, 69, 19));
 
-    // Pockets
     sf::CircleShape pockets[14];
     for (int i = 0; i < 14; ++i)
     {
         pockets[i].setRadius(30.f);
         pockets[i].setFillColor(sf::Color::White);
-        // Set positions for pockets
         if (i == 13)
         { // Player 1's store
             pockets[i].setPosition(720.f, 250.f);
@@ -58,8 +56,7 @@ int main()
                 {
                     board.move(pocketIndex);
                     std::cout << "Picked pocket" << std::endl;
-
-                    // TODO: Add code to update the graphical representation of pockets
+                    // TODO: Add code to update GUI
                 }
             }
         }
@@ -110,7 +107,7 @@ int getPocketIndex(int x, int y)
     if (std::hypot(player1Store.x - x, player1Store.y - y) <= radius)
         return 13;
 
-    return -1; // No valid pocket clicked
+    return -1; 
 }
 
 int simulateGame()
