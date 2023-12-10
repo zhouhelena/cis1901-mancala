@@ -9,30 +9,35 @@ Computer::Computer(int playerNo) : playerNo(playerNo)
 /// @return -1 if error, otherwise which pocket to move from
 int Computer::getMove(Board b)
 {
-    if (playerNo == 0)
+    int maxPocket = playerNo == 0 ? 5 : 12;
+    int minPocket = playerNo == 0 ? 0 : 7;
+    int store = playerNo == 0 ? 6 : 13;
+
+    for (int i = maxPocket; i >= minPocket; i--)
     {
-        for (int i = 0; i < 6; i++)
+        // last pebble dropped in store
+        if (b.countPebbles(i) == (store - i))
+            return i;
+    }
+
+    for (int i = maxPocket; i >= minPocket; i--)
+    {
+        // last pebble in empty pocket (takes all pebbles from opposite pocket)
+        if (b.countPebbles(i) == 0 && b.countPebbles(12 - i))
         {
-            if (b.countPebbles(i) > 0)
-                // TODO: add smarter AI
-                return i;
-
-            // move the store that will allow the player to move again
-            // if (b.countPebbles(i) == 0 && b.countPebbles(12 - i) > 0)
-            //     return 12 - i;
-
-            // take adv of the hop move rule thing
-            // etc
+            for (int j = i - 1; j >= minPocket; j++)
+            {
+                if (b.countPebbles(j) == (i - j))
+                    return j;
+            }
         }
     }
-    else
+
+    // else just return the first pocket that has pebbles
+    for (int i = maxPocket; i >= minPocket; i--)
     {
-        for (int i = 7; i < 13; i++)
-        {
-            if (b.countPebbles(i) > 0)
-                // TODO: add smarter AI
-                return i;
-        }
+        if (b.countPebbles(i) > 0)
+            return i;
     }
     return -1;
 }
