@@ -55,21 +55,20 @@ int main()
         pockets[i].setRadius(30.f);
         pockets[i].setFillColor(sf::Color::White);
         // Set positions for pockets
-        if (i < 6)
+        if (i == 13)
+        { // Player 1's store
+            pockets[i].setPosition(720.f, 250.f);
+        } else if (i == 6)
+        { // Player 0's store
+            pockets[i].setPosition(40.f, 250.f);
+        }
+        else if (i < 6)
         { // Bottom row
-            pockets[i].setPosition(60.f + i * 100, 300.f);
+            pockets[i].setPosition(120.f + i * 100, 300.f);
         }
         else if (i < 13)
         { // Top row
-            pockets[i].setPosition(60.f + (i - 7) * 100, 200.f);
-        }
-        else if (i == 13)
-        { // Player 1's store
-            pockets[i].setPosition(720.f, 200.f);
-        }
-        else if (i == 6)
-        { // Player 0's store
-            pockets[i].setPosition(40.f, 200.f);
+            pockets[i].setPosition(120.f + (i - 7) * 100, 200.f);
         }
     }
 
