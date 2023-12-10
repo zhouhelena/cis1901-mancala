@@ -19,7 +19,6 @@ private:
     bool isStore(int pocketIndex);
 
 public:
-    std::unique_ptr<bool> isGameOver;
     Board();
     // TODO: implement destructor
     // ~Board() = default;
@@ -30,8 +29,11 @@ public:
     void print();
     void printCurrPlayer();
 
-    // helpers
+    // Helpers
     int countPebbles(int pocketIndex);
+    std::unique_ptr<bool> isGameOver;
+    const std::vector<std::vector<std::unique_ptr<Pebble>>>& getBoard() const { return board; }
+
 };
 
 #endif

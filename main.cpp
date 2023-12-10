@@ -65,14 +65,38 @@ int main()
         window.clear();
 
         window.draw(boardShape);
-        for (auto &pocket : pockets)
-        {
-            window.draw(pocket);
-        }
+        const auto& pocketsWithPebbles = board.getBoard();
 
+        for (int i = 0; i < 14; ++i)
+        {
+            window.draw(pockets[i]);
+
+            sf::Vector2f pocketPosition = pockets[i].getPosition();
+            pocketCenter.x += pockets[i].getRadius();
+            pocketCenter.y += pockets[i].getRadius();
+
+            // Get pebbles for the current pocket
+            const auto& pebbles = pocketsWithPebbles[i];
+            float angleIncrement = 360.0f / pebbles.size();
+            float angle = 0.0f; 
+
+            for (const auto& pebble : pebbles)
+            {
+                // Set the position of each pebble relative to its pocket's position
+                float radianAngle = angle * 3.14159265f / 180.0f;
+                float distanceFromCenter = 15.0f; // Adjust this to fit within the pocket
+                float pebbleX = pocketCenter.x + distanceFromCenter * cos(radianAngle);
+                float pebbleY = pocketCenter.y + distanceFromCenter * sin(radianAngle);
+
+                sf::CircleShape pebbleShape = pebble->getShape();
+                pebbleShape.setPosition(pebbleX, pebbleY);
+                window.draw(pebbleShape);
+
+                angle += angleIncrement;
+            }
+        }
         window.display();
     }
-
     return 0;
 }
 
