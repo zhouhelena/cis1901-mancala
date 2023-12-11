@@ -71,7 +71,7 @@ int main()
         {
             window.draw(pockets[i]);
 
-            sf::Vector2f pocketPosition = pockets[i].getPosition();
+            sf::Vector2f pocketCenter = pockets[i].getPosition();
             pocketCenter.x += pockets[i].getRadius();
             pocketCenter.y += pockets[i].getRadius();
 
