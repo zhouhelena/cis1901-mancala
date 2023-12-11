@@ -102,7 +102,12 @@ int main()
 
 int getButtonHit(int x, int y)
 {
-    return 0;
+    if (x > 150 && x < 380 && y > 250 && y < 380)
+        return 0;
+    else if (x > 450 && x < 680 && y > 250 && y < 380)
+        return 1;
+    else
+        return -1;
 }
 
 int renderSinglePlayerGame(sf::RenderWindow *window)
