@@ -35,12 +35,6 @@ bool Board::move(int pocketIndex)
     if (!canMove(pocketIndex))
         return false;
 
-    if (*currentPlayer == 0 && pocketIndex >= 6)
-        return false;
-
-    if (*currentPlayer == 1 && pocketIndex < 7)
-        return false;
-
     // Grab pebbles from pocket
     std::vector<std::unique_ptr<Pebble>> hand;
     hand.swap(board[pocketIndex]);
@@ -59,36 +53,24 @@ bool Board::move(int pocketIndex)
         board[currentIndex].push_back(std::move(hand.back()));
         hand.pop_back();
 
-        if (hand.empty())
+        if (hand.empty() && !(currentIndex > 5 && *currentPlayer == 0) && !(currentIndex < 7 && *currentPlayer == 1))
         {
             // If the last pebble lands in an empty pocket on the player's side
             // and the opposite pocket is not empty, capture both pebbles and
             // place them in the player's store
             if (board[currentIndex].size() == 1 && !isStore(currentIndex) && !board[12 - currentIndex].empty())
             {
-                // Grab pebbles from opposite pocket
+                // Grab pebbles from pocket
                 std::vector<std::unique_ptr<Pebble>> oppositePebbles;
                 oppositePebbles.swap(board[12 - currentIndex]);
+                std::cout << "Captured " << oppositePebbles.size() << " pebbles" << std::endl;
 
+                int playerStore = *currentPlayer == 0 ? 6 : 13;
                 // Place pebbles in player's store
-                if (*currentPlayer == 0)
-                {
-                    for (int i = 0; i < oppositePebbles.size(); ++i)
-                        board[6].push_back(std::move(oppositePebbles[i]));
-
-                    hand.clear();
-                    hand.swap(board[currentIndex]);
-                    board[6].push_back(std::move(board[currentIndex].back()));
-                }
-                else
-                {
-                    for (int i = 0; i < oppositePebbles.size(); ++i)
-                        board[13].push_back(std::move(oppositePebbles[i]));
-
-                    hand.clear();
-                    hand.swap(board[currentIndex]);
-                    board[13].push_back(std::move(board[currentIndex].back()));
-                }
+                for (int i = 0; i < oppositePebbles.size(); i++)
+                    board[playerStore].push_back(std::move(oppositePebbles[i]));
+                board[playerStore].push_back(std::move(board[currentIndex].back()));
+                board[currentIndex].pop_back();
             }
         }
     }
@@ -101,7 +83,8 @@ bool Board::move(int pocketIndex)
     {
         *currentPlayer = (*currentPlayer + 1) % 2;
         std::cout << "Switched players: " << *currentPlayer << std::endl;
-    } else
+    }
+    else
     {
         std::cout << "Extra turn for player: " << *currentPlayer << std::endl;
     }

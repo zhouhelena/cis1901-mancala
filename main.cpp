@@ -295,6 +295,8 @@ int renderTwoPlayerGame(sf::RenderWindow *window)
             pocketCenter.y += pockets[i].getRadius();
 
             const auto &pebbles = pocketsWithPebbles[i];
+            if (pebbles.size() == 0)
+                continue;
             float angleIncrement = 360.0f / pebbles.size();
             float angle = 0.0f;
 
@@ -312,6 +314,7 @@ int renderTwoPlayerGame(sf::RenderWindow *window)
                 angle += angleIncrement;
             }
         }
+
         window->display();
     }
     return 0;
