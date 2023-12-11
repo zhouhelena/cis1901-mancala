@@ -251,10 +251,8 @@ int renderTwoPlayerGame(sf::RenderWindow *window)
 
     sf::Text text;
     text.setFont(font);
-    text.setString("Player One's Turn to Move");
     text.setCharacterSize(24);
     text.setFillColor(sf::Color::White);
-    text.setPosition(sf::Vector2f{window->getSize() / 5u});
 
     while (window->isOpen())
     {
@@ -280,6 +278,7 @@ int renderTwoPlayerGame(sf::RenderWindow *window)
         }
 
         board.getCurrentPlayer() == 0 ? text.setString("Player One's Turn to Move") : text.setString("Player Two's Turn to Move");
+        board.getCurrentPlayer() == 0 ? text.setPosition(sf::Vector2f(400, 410)) : text.setPosition(sf::Vector2f(20, 120));
 
         // render board
         window->clear();
