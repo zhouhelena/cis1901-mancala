@@ -97,12 +97,22 @@ bool Board::move(int pocketIndex)
     }
 
     // Switch current player if the last pebble did not land in the player's store
-    if (!(currentIndex == 6 && *currentPlayer == 0) || !(currentIndex == 13 && *currentPlayer == 1))
+    bool landedInOwnStore0 = *currentPlayer == 0 && currentIndex == 6; 
+    bool landedInOwnStore1 = *currentPlayer == 1 && currentIndex == 13;
+
+    if (landedInOwnStore0) 
     {
-        *currentPlayer = (*currentPlayer + 1) % 2;
+        extraTurn0 = true;  
+    } else if (landedInOwnStore1) 
+    {
+        extraTurn1 = true;
+    } else {
+        extraTurn0 = false;
+        extraTurn1 = false;
+        *currentPlayer = (*currentPlayer + 1) % 2; // Switch players
         std::cout << "Switched players: " << *currentPlayer << std::endl;
     }
-
+    
     // Check if game over
     *isGameOver = checkVictory();
 
