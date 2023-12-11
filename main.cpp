@@ -1,4 +1,5 @@
 #include "Board.hpp"
+#include "computer.hpp"
 #include <stdexcept>
 #include <iostream>
 #include <limits>
@@ -11,6 +12,7 @@ int main()
 {
     sf::RenderWindow window(sf::VideoMode(820, 600), "Mancala");
     Board board;
+    Computer computer(1);
 
     sf::RectangleShape boardShape(sf::Vector2f(780, 230));
     boardShape.setPosition(20, 170);
@@ -21,10 +23,10 @@ int main()
     {
         pockets[i].setRadius(30.f);
         pockets[i].setFillColor(sf::Color::White);
-        if (i == 13)
+        if (i == 6)
         { // Player 1's store
             pockets[i].setPosition(720.f, 250.f);
-        } else if (i == 6)
+        } else if (i == 13)
         { // Player 0's store
             pockets[i].setPosition(40.f, 250.f);
         }
@@ -34,7 +36,7 @@ int main()
         }
         else if (i < 13)
         { // Top row
-            pockets[i].setPosition(130.f + (i - 7) * 100, 200.f);
+            pockets[i].setPosition(130.f + (12 - i) * 100, 200.f);
         }
     }
 
@@ -47,7 +49,7 @@ int main()
                 window.close();
         
 
-            if (event.type == sf::Event::MouseButtonPressed)
+            if (board.getCurrentPlayer() == 0 && !board.getIsGameOver() && event.type == sf::Event::MouseButtonPressed)
             {
                 if (event.mouseButton.button == sf::Mouse::Left)
                 {
@@ -59,6 +61,17 @@ int main()
                         // TODO: Add code to update GUI
                     }
                 }
+            }
+        }
+
+        if (board.getCurrentPlayer() == 1 && !board.getIsGameOver())
+        {
+            int computerMove = computer.getMove(board);
+            if (computerMove != -1)
+            {
+                board.move(computerMove);
+                std::cout << "Computer picked pocket " << computerMove << std::endl;
+                std::cout << "Current turn " << board.getCurrentPlayer() << std::endl;
             }
         }
 
@@ -75,16 +88,14 @@ int main()
             pocketCenter.x += pockets[i].getRadius();
             pocketCenter.y += pockets[i].getRadius();
 
-            // Get pebbles for the current pocket
             const auto& pebbles = pocketsWithPebbles[i];
             float angleIncrement = 360.0f / pebbles.size();
             float angle = 0.0f; 
 
             for (const auto& pebble : pebbles)
             {
-                // Set the position of each pebble relative to its pocket's position
                 float radianAngle = angle * 3.14159265f / 180.0f;
-                float distanceFromCenter = 15.0f; // Adjust this to fit within the pocket
+                float distanceFromCenter = 15.0f; 
                 float pebbleX = pocketCenter.x + distanceFromCenter * cos(radianAngle);
                 float pebbleY = pocketCenter.y + distanceFromCenter * sin(radianAngle);
 
@@ -143,45 +154,36 @@ int getPocketIndex(int x, int y)
     return -1; 
 }
 
-int simulateGame()
-{
-    Board board;
-    board.print();
-    board.printCurrPlayer();
+// int simulateGame()
+// {
+//     Board board;
+//     board.print();
+//     board.printCurrPlayer();
 
-    while (!board.checkVictory())
-    {
-        int move;
-        std::cout << "Enter move: ";
-        std::cin >> move;
-        if (!board.canMove(move))
-        {
-            std::cout << "Invalid input. Please enter a valid pocket number: " << std::endl;
-            std::cin.clear();
-            std::cin >> move;
-        }
-        board.move(move);
-        board.print();
-        board.printCurrPlayer();
-    }
+//     while (!board.checkVictory())
+//     {
+//         int move;
+//         std::cout << "Enter move: ";
+//         std::cin >> move;
+//         if (!board.canMove(move))
+//         {
+//             std::cout << "Invalid input. Please enter a valid pocket number: " << std::endl;
+//             std::cin.clear();
+//             std::cin >> move;
+//         }
+//         board.move(move);
+//         board.print();
+//         board.printCurrPlayer();
+//     }
 
-    return 0;
-}
+//     return 0;
+// }
 
 // int main(void)
 // {
 //     Board board;
-//     try
-//     {
-//         board = Board();
-//     }
-//     catch (std::runtime_error ex)
-//     {
-//         std::cout << ex.what() << std::endl;
-//         return 1;
-//     }
 
-//     while (!*board.isGameOver)
+//     while (!board.getIsGameOver())
 //     {
 //         board.print();
 //         board.printCurrPlayer();

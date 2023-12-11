@@ -97,9 +97,10 @@ bool Board::move(int pocketIndex)
     }
 
     // Switch current player if the last pebble did not land in the player's store
-    if ((currentIndex != 6 || *currentPlayer != 0) && (currentIndex != 13 || *currentPlayer != 1))
+    if (!(currentIndex == 6 && *currentPlayer == 0) || !(currentIndex == 13 && *currentPlayer == 1))
     {
         *currentPlayer = (*currentPlayer + 1) % 2;
+        std::cout << "Switched players: " << *currentPlayer << std::endl;
     }
 
     // Check if game over
@@ -232,7 +233,7 @@ void Board::printCurrPlayer()
     std::cout << "Player " << *currentPlayer << "'s turn: " << std::endl;
 }
 
-int Board::countPebbles(int pocketIndex)
+int Board::countPebbles(int pocketIndex) const
 {
     return board[pocketIndex].size();
 }

@@ -15,7 +15,7 @@ private:
     std::unique_ptr<int> score0;
     std::unique_ptr<int> score1;
     std::unique_ptr<int> winner;
-
+    std::unique_ptr<bool> isGameOver;
     bool isStore(int pocketIndex);
 
 public:
@@ -30,10 +30,10 @@ public:
     void printCurrPlayer();
 
     // Helpers
-    int countPebbles(int pocketIndex);
-    std::unique_ptr<bool> isGameOver;
+    int countPebbles(int pocketIndex) const;
+    int getCurrentPlayer() const { return *currentPlayer; }
+    bool getIsGameOver() const { return *isGameOver; }
     const std::vector<std::vector<std::unique_ptr<Pebble>>>& getBoard() const { return board; }
-
 };
 
 #endif

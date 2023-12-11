@@ -17,7 +17,7 @@ public:
     // TODO: implement destructor
     // ~Computer() = default;
 
-    int getMove(Board b);
+    int getMove(const Board& b);
 };
 
 #endif
