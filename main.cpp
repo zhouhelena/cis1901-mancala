@@ -15,8 +15,6 @@ int renderSinglePlayerGame(sf::RenderWindow *window);
 int renderTwoPlayerGame(sf::RenderWindow *window);
 int getPocketIndex(int x, int y);
 void initializePockets(sf::CircleShape pockets[], int numPockets);
-void handleGameOver(Board &board, sf::RenderWindow *window, sf::Text &text, sf::RectangleShape &boardShape,
-                    std::string playerOneName, std::string playerTwoName);
 
 int main()
 {
@@ -140,8 +138,21 @@ int renderSinglePlayerGame(sf::RenderWindow *window)
     {
         if (board.getIsGameOver())
         {
-            handleGameOver(board, window, text, boardShape,
-                           "Player", "Computer");
+            std::cout << "Game over" << std::endl;
+            std::cout << "Player score: " << board.getScore(0) << std::endl;
+            std::cout << "Computer score: " << board.getScore(1) << std::endl;
+            if (board.getScore(0) > board.getScore(1))
+                text.setString("Player wins!");
+            else if (board.getScore(1) > board.getScore(0))
+                text.setString("Computer wins!");
+            else
+                text.setString("Tie game!");
+            text.setPosition(sf::Vector2f(300, 300));
+            window->clear();
+            window->draw(boardShape);
+            window->draw(text);
+            window->display();
+            sf::sleep(sf::seconds(10));
             break;
         }
 
@@ -240,8 +251,21 @@ int renderTwoPlayerGame(sf::RenderWindow *window)
     {
         if (board.getIsGameOver())
         {
-            handleGameOver(board, window, text, boardShape,
-                           "Player One", "Player Two");
+            std::cout << "Game over" << std::endl;
+            std::cout << "Player 0 score: " << board.getScore(0) << std::endl;
+            std::cout << "Player 1 score: " << board.getScore(1) << std::endl;
+            if (board.getScore(0) > board.getScore(1))
+                text.setString("Player One wins!");
+            else if (board.getScore(1) > board.getScore(0))
+                text.setString("Player Two wins!");
+            else
+                text.setString("Tie game!");
+            text.setPosition(sf::Vector2f(300, 300));
+            window->clear();
+            window->draw(boardShape);
+            window->draw(text);
+            window->display();
+            sf::sleep(sf::seconds(10));
             break;
         }
 
@@ -305,7 +329,6 @@ int renderTwoPlayerGame(sf::RenderWindow *window)
 
         window->display();
     }
-
     return 0;
 }
 
@@ -373,37 +396,4 @@ void initializePockets(sf::CircleShape pockets[], int numPockets)
             pockets[i].setPosition(130.f + (12 - i) * 100, 200.f);
         }
     }
-}
-
-void handleGameOver(Board &board, sf::RenderWindow *window, sf::Text &text, sf::RectangleShape &boardShape,
-                    std::string playerOneName, std::string playerTwoName)
-{
-    if (!board.getIsGameOver())
-    {
-        return;
-    }
-
-    std::cout << "Game over" << std::endl;
-    std::cout << "Player 0 score: " << board.getScore(0) << std::endl;
-    std::cout << "Player 1 score: " << board.getScore(1) << std::endl;
-
-    if (board.getScore(0) > board.getScore(1))
-    {
-        text.setString(playerOneName + " wins!");
-    }
-    else if (board.getScore(1) > board.getScore(0))
-    {
-        text.setString(playerTwoName + " wins!");
-    }
-    else
-    {
-        text.setString("Tie game!");
-    }
-
-    text.setPosition(sf::Vector2f(300, 300));
-    window->clear();
-    window->draw(boardShape);
-    window->draw(text);
-    window->display();
-    sf::sleep(sf::seconds(10));
 }
