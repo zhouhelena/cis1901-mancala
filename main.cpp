@@ -144,6 +144,15 @@ int renderSinglePlayerGame(sf::RenderWindow *window)
         }
     }
 
+    sf::Font font;
+    if (!font.loadFromFile("assets/texastango.otf"))
+        std::cout << "Error loading font" << std::endl;
+
+    sf::Text text;
+    text.setFont(font);
+    text.setCharacterSize(24);
+    text.setFillColor(sf::Color::White);
+
     while (window->isOpen())
     {
         sf::Event event;
@@ -179,9 +188,12 @@ int renderSinglePlayerGame(sf::RenderWindow *window)
             }
         }
 
-        window->clear();
+        board.getCurrentPlayer() == 0 ? text.setString("Player One's Turn to Move") : text.setString("Computer's Turn to Move");
+        board.getCurrentPlayer() == 0 ? text.setPosition(sf::Vector2f(400, 410)) : text.setPosition(sf::Vector2f(20, 120));
 
+        window->clear();
         window->draw(boardShape);
+        window->draw(text);
         const auto &pocketsWithPebbles = board.getBoard();
 
         for (int i = 0; i < 14; ++i)
