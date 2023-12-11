@@ -63,7 +63,6 @@ bool Board::move(int pocketIndex)
                 // Grab pebbles from pocket
                 std::vector<std::unique_ptr<Pebble>> oppositePebbles;
                 oppositePebbles.swap(board[12 - currentIndex]);
-                std::cout << "Captured " << oppositePebbles.size() << " pebbles" << std::endl;
 
                 int playerStore = *currentPlayer == 0 ? 6 : 13;
                 // Place pebbles in player's store
