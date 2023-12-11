@@ -31,18 +31,15 @@ Board::Board()
 
 bool Board::move(int pocketIndex)
 {
+    std::cout << "Board::move called" << std::endl;
     if (!canMove(pocketIndex))
         return false;
 
     if (*currentPlayer == 0 && pocketIndex >= 6)
-    {
         return false;
-    }
 
     if (*currentPlayer == 1 && pocketIndex < 7)
-    {
         return false;
-    }
 
     // Grab pebbles from pocket
     std::vector<std::unique_ptr<Pebble>> hand;
@@ -96,23 +93,19 @@ bool Board::move(int pocketIndex)
         }
     }
 
-    // Switch current player if the last pebble did not land in the player's store
-    bool landedInOwnStore0 = *currentPlayer == 0 && currentIndex == 6; 
-    bool landedInOwnStore1 = *currentPlayer == 1 && currentIndex == 13;
+    std::cout << "Current player: " << *currentPlayer << std::endl;
+    std::cout << "Current index: " << currentIndex << std::endl;
 
-    if (landedInOwnStore0) 
+    // Switch current player if the last pebble did not land in the player's store
+    if (!(currentIndex == 6 && *currentPlayer == 0) && !(currentIndex == 13 && *currentPlayer == 1))
     {
-        extraTurn0 = true;  
-    } else if (landedInOwnStore1) 
-    {
-        extraTurn1 = true;
-    } else {
-        extraTurn0 = false;
-        extraTurn1 = false;
-        *currentPlayer = (*currentPlayer + 1) % 2; // Switch players
+        *currentPlayer = (*currentPlayer + 1) % 2;
         std::cout << "Switched players: " << *currentPlayer << std::endl;
+    } else
+    {
+        std::cout << "Extra turn for player: " << *currentPlayer << std::endl;
     }
-    
+
     // Check if game over
     *isGameOver = checkVictory();
 
