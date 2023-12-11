@@ -7,7 +7,7 @@ Computer::Computer(int playerNo) : playerNo(playerNo)
 /// @brief calculates move for computer player
 /// @param b the board
 /// @return -1 if error, otherwise which pocket to move from
-int Computer::getMove(Board b)
+int Computer::getMove(const Board& b)
 {
     int maxPocket = playerNo == 0 ? 5 : 12;
     int minPocket = playerNo == 0 ? 0 : 7;
