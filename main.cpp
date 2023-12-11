@@ -5,6 +5,7 @@
 #include <limits>
 #include <cmath>
 #include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>
 
 #include "button.hpp"
 
@@ -157,8 +158,9 @@ int renderSinglePlayerGame(sf::RenderWindow *window)
                     int pocketIndex = getPocketIndex(event.mouseButton.x, event.mouseButton.y);
                     if (board.canMove(pocketIndex))
                     {
-                        board.move(pocketIndex);
                         std::cout << "Picked pocket " << pocketIndex << std::endl;
+                        board.move(pocketIndex);
+                        sf::sleep(sf::seconds(1));
                     }
                 }
             }
@@ -167,11 +169,12 @@ int renderSinglePlayerGame(sf::RenderWindow *window)
         if (board.getCurrentPlayer() == 1 && !board.getIsGameOver())
         {
             int computerMove = computer.getMove(board);
-            if (computerMove != -1)
+            if (computerMove != -1 && board.canMove(computerMove))
             {
-                board.move(computerMove);
                 std::cout << "Computer picked pocket " << computerMove << std::endl;
                 std::cout << "Current turn " << board.getCurrentPlayer() << std::endl;
+                board.move(computerMove); 
+                sf::sleep(sf::seconds(1));
             }
         }
 
@@ -226,7 +229,6 @@ int getPocketIndex(int x, int y)
         // std::cout << "Checking pocket " << i << " at (" << pocketCenter.x << ", " << pocketCenter.y << ") against click (" << x << ", " << y << ")" << std::endl;
         if (std::hypot(pocketCenter.x - x, pocketCenter.y - y) <= radius)
         {
-            std::cout << "Returned pocket " << i << std::endl;
             return i;
         }
     }
@@ -237,7 +239,6 @@ int getPocketIndex(int x, int y)
         sf::Vector2f pocketCenter = bottomRowOffset + sf::Vector2f(i * diameter, 0.f);
         if (std::hypot(pocketCenter.x - x, pocketCenter.y - y) <= radius)
         {
-            std::cout << "Returned pocket " << i << std::endl;
             return i;
         }
     }
