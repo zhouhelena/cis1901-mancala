@@ -256,6 +256,26 @@ int renderTwoPlayerGame(sf::RenderWindow *window)
 
     while (window->isOpen())
     {
+        if (board.getIsGameOver())
+        {
+            std::cout << "Game over" << std::endl;
+            std::cout << "Player 0 score: " << board.getScore(0) << std::endl;
+            std::cout << "Player 1 score: " << board.getScore(1) << std::endl;
+            if (board.getScore(0) > board.getScore(1))
+                text.setString("Player One wins!");
+            else if (board.getScore(1) > board.getScore(0))
+                text.setString("Player Two wins!");
+            else
+                text.setString("Tie game!");
+            text.setPosition(sf::Vector2f(300, 300));
+            window->clear();
+            window->draw(boardShape);
+            window->draw(text);
+            window->display();
+            sf::sleep(sf::seconds(10));
+            break;
+        }
+
         sf::Event event;
         while (window->pollEvent(event))
         {

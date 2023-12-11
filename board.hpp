@@ -30,6 +30,7 @@ public:
     bool checkVictory();
     void print();
     void printCurrPlayer();
+    int getScore(int player);
 
     // Helpers
     int countPebbles(int pocketIndex) const;

@@ -117,47 +117,48 @@ bool Board::canMove(int pocketIndex)
 bool Board::checkVictory()
 {
     // Check if all pockets on one side are empty
-    bool side0Empty = true, side1Empty = true;
+    bool side0Empty, side1Empty = true;
     for (int i = 0; i < 6; ++i)
     {
         if (!board[i].empty())
-        {
             side0Empty = false;
-            break;
-        }
     }
     for (int i = 7; i < 13; ++i)
     {
         if (!board[i].empty())
-        {
             side1Empty = false;
-            break;
-        }
     }
 
-    if (side0Empty || side1Empty)
+    if (!side0Empty && !side1Empty)
+        return false;
+    
+    *score0 = board[6].size();
+    *score1 = board[13].size();
+
+    for (int i = 0; i < 6; ++i)
     {
-        *score0 = board[6].size();
-        *score1 = board[13].size();
-
-        if (*score0 > *score1)
-        {
-            winner = std::make_unique<int>(0);
-        }
-        else if (*score1 > *score0)
-        {
-            winner = std::make_unique<int>(1);
-        }
-        else
-        {
-            winner = std::make_unique<int>(-1); // A tie
-        }
-
-        *isGameOver = true;
-        return *isGameOver;
+        *score0 += board[i].size();
+    }
+    for (int i = 7; i < 13; ++i)
+    {
+        *score1 += board[i].size();
     }
 
-    return false;
+    if (*score0 > *score1)
+    {
+        winner = std::make_unique<int>(0);
+    }
+    else if (*score1 > *score0)
+    {
+        winner = std::make_unique<int>(1);
+    }
+    else
+    {
+        winner = std::make_unique<int>(-1); // A tie
+    }
+
+    *isGameOver = true;
+    return *isGameOver;
 }
 
 std::string formatPrint(int i, bool isStore = false)
@@ -221,4 +222,14 @@ void Board::printCurrPlayer()
 int Board::countPebbles(int pocketIndex) const
 {
     return board[pocketIndex].size();
+}
+
+int Board::getScore(int player)
+{
+    if (player == 0)
+        return *score0;
+    else if (player == 1)
+        return *score1;
+    else
+        return -1;
 }
