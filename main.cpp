@@ -12,6 +12,7 @@
 int getButtonHit(int x, int y);
 
 int renderSinglePlayerGame(sf::RenderWindow *window);
+int renderTwoPlayerGame(sf::RenderWindow *window);
 int getPocketIndex(int x, int y);
 
 int main()
@@ -95,7 +96,7 @@ int main()
     }
     else if (buttonHit == 1)
     {
-        // simulateGame();
+        return renderTwoPlayerGame(&window);
     }
 
     return 0;
@@ -173,7 +174,7 @@ int renderSinglePlayerGame(sf::RenderWindow *window)
             {
                 std::cout << "Computer picked pocket " << computerMove << std::endl;
                 std::cout << "Current turn " << board.getCurrentPlayer() << std::endl;
-                board.move(computerMove); 
+                board.move(computerMove);
                 sf::sleep(sf::seconds(1));
             }
         }
@@ -183,6 +184,108 @@ int renderSinglePlayerGame(sf::RenderWindow *window)
         window->draw(boardShape);
         const auto &pocketsWithPebbles = board.getBoard();
 
+        for (int i = 0; i < 14; ++i)
+        {
+            window->draw(pockets[i]);
+
+            sf::Vector2f pocketCenter = pockets[i].getPosition();
+            pocketCenter.x += pockets[i].getRadius();
+            pocketCenter.y += pockets[i].getRadius();
+
+            const auto &pebbles = pocketsWithPebbles[i];
+            float angleIncrement = 360.0f / pebbles.size();
+            float angle = 0.0f;
+
+            for (const auto &pebble : pebbles)
+            {
+                float radianAngle = angle * 3.14159265f / 180.0f;
+                float distanceFromCenter = 15.0f;
+                float pebbleX = pocketCenter.x + distanceFromCenter * cos(radianAngle);
+                float pebbleY = pocketCenter.y + distanceFromCenter * sin(radianAngle);
+
+                sf::CircleShape pebbleShape = pebble->getShape();
+                pebbleShape.setPosition(pebbleX, pebbleY);
+                window->draw(pebbleShape);
+
+                angle += angleIncrement;
+            }
+        }
+        window->display();
+    }
+    return 0;
+}
+
+int renderTwoPlayerGame(sf::RenderWindow *window)
+{
+    Board board;
+    sf::RectangleShape boardShape(sf::Vector2f(780, 230));
+    boardShape.setPosition(20, 170);
+    boardShape.setFillColor(sf::Color(139, 69, 19));
+
+    sf::CircleShape pockets[14];
+    for (int i = 0; i < 14; ++i)
+    {
+        pockets[i].setRadius(30.f);
+        pockets[i].setFillColor(sf::Color::White);
+        if (i == 6)
+        { // Player 1's store
+            pockets[i].setPosition(720.f, 250.f);
+        }
+        else if (i == 13)
+        { // Player 0's store
+            pockets[i].setPosition(40.f, 250.f);
+        }
+        else if (i < 6)
+        { // Bottom row
+            pockets[i].setPosition(130.f + i * 100, 300.f);
+        }
+        else if (i < 13)
+        { // Top row
+            pockets[i].setPosition(130.f + (12 - i) * 100, 200.f);
+        }
+    }
+
+    sf::Font font;
+    if (!font.loadFromFile("assets/texastango.otf"))
+        std::cout << "Error loading font" << std::endl;
+
+    sf::Text text;
+    text.setFont(font);
+    text.setString("Player One's Turn to Move");
+    text.setCharacterSize(24);
+    text.setFillColor(sf::Color::White);
+    text.setPosition(sf::Vector2f{window->getSize() / 5u});
+
+    while (window->isOpen())
+    {
+        sf::Event event;
+        while (window->pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed) // handle close event
+                window->close();
+
+            if (!board.getIsGameOver() && event.type == sf::Event::MouseButtonPressed)
+            {
+                if (event.mouseButton.button == sf::Mouse::Left)
+                {
+                    int pocketIndex = getPocketIndex(event.mouseButton.x, event.mouseButton.y);
+                    if (board.canMove(pocketIndex))
+                    {
+                        std::cout << "Picked pocket " << pocketIndex << std::endl;
+                        board.move(pocketIndex);
+                        sf::sleep(sf::seconds(1));
+                    }
+                }
+            }
+        }
+
+        board.getCurrentPlayer() == 0 ? text.setString("Player One's Turn to Move") : text.setString("Player Two's Turn to Move");
+
+        // render board
+        window->clear();
+        window->draw(boardShape);
+        window->draw(text);
+        const auto &pocketsWithPebbles = board.getBoard();
         for (int i = 0; i < 14; ++i)
         {
             window->draw(pockets[i]);
@@ -254,53 +357,3 @@ int getPocketIndex(int x, int y)
 
     return -1;
 }
-
-// int simulateGame()
-// {
-//     Board board;
-//     board.print();
-//     board.printCurrPlayer();
-
-//     while (!board.checkVictory())
-//     {
-//         int move;
-//         std::cout << "Enter move: ";
-//         std::cin >> move;
-//         if (!board.canMove(move))
-//         {
-//             std::cout << "Invalid input. Please enter a valid pocket number: " << std::endl;
-//             std::cin.clear();
-//             std::cin >> move;
-//         }
-//         board.move(move);
-//         board.print();
-//         board.printCurrPlayer();
-//     }
-
-//     return 0;
-// }
-
-// int main(void)
-// {
-//     Board board;
-
-//     while (!board.getIsGameOver())
-//     {
-//         board.print();
-//         board.printCurrPlayer();
-
-//         int pocketIndex;
-//         std::cout << "Choose a pocket (0-5 for Player 0, 7-12 for Player 1): ";
-//         while (!(std::cin >> pocketIndex) || !board.move(pocketIndex))
-//         {
-//             std::cout << "Invalid input. Please enter a valid pocket number: ";
-//             std::cin.clear();
-//             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-//         }
-
-//         board.move(pocketIndex);
-//     }
-
-//     board.print(); // Print final board state, final scores, etc.
-//     return 0;
-// }
