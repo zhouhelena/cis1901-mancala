@@ -14,6 +14,9 @@ int getButtonHit(int x, int y);
 int renderSinglePlayerGame(sf::RenderWindow *window);
 int renderTwoPlayerGame(sf::RenderWindow *window);
 int getPocketIndex(int x, int y);
+void initializePockets(sf::CircleShape pockets[], int numPockets);
+void handleGameOver(Board &board, sf::RenderWindow *window, sf::Text &text, sf::RectangleShape &boardShape,
+                    std::string playerOneName, std::string playerTwoName);
 
 int main()
 {
@@ -122,27 +125,7 @@ int renderSinglePlayerGame(sf::RenderWindow *window)
     boardShape.setFillColor(sf::Color(139, 69, 19));
 
     sf::CircleShape pockets[14];
-    for (int i = 0; i < 14; ++i)
-    {
-        pockets[i].setRadius(30.f);
-        pockets[i].setFillColor(sf::Color::White);
-        if (i == 6)
-        { // Player 1's store
-            pockets[i].setPosition(720.f, 250.f);
-        }
-        else if (i == 13)
-        { // Player 0's store
-            pockets[i].setPosition(40.f, 250.f);
-        }
-        else if (i < 6)
-        { // Bottom row
-            pockets[i].setPosition(130.f + i * 100, 300.f);
-        }
-        else if (i < 13)
-        { // Top row
-            pockets[i].setPosition(130.f + (12 - i) * 100, 200.f);
-        }
-    }
+    initializePockets(pockets, 14);
 
     sf::Font font;
     if (!font.loadFromFile("assets/texastango.otf"))
@@ -155,6 +138,13 @@ int renderSinglePlayerGame(sf::RenderWindow *window)
 
     while (window->isOpen())
     {
+        if (board.getIsGameOver())
+        {
+            handleGameOver(board, window, text, boardShape,
+                           "Player", "Computer");
+            break;
+        }
+
         sf::Event event;
         while (window->pollEvent(event))
         {
@@ -235,27 +225,7 @@ int renderTwoPlayerGame(sf::RenderWindow *window)
     boardShape.setFillColor(sf::Color(139, 69, 19));
 
     sf::CircleShape pockets[14];
-    for (int i = 0; i < 14; ++i)
-    {
-        pockets[i].setRadius(30.f);
-        pockets[i].setFillColor(sf::Color::White);
-        if (i == 6)
-        { // Player 1's store
-            pockets[i].setPosition(720.f, 250.f);
-        }
-        else if (i == 13)
-        { // Player 0's store
-            pockets[i].setPosition(40.f, 250.f);
-        }
-        else if (i < 6)
-        { // Bottom row
-            pockets[i].setPosition(130.f + i * 100, 300.f);
-        }
-        else if (i < 13)
-        { // Top row
-            pockets[i].setPosition(130.f + (12 - i) * 100, 200.f);
-        }
-    }
+    initializePockets(pockets, 14);
 
     sf::Font font;
     if (!font.loadFromFile("assets/texastango.otf"))
@@ -270,21 +240,8 @@ int renderTwoPlayerGame(sf::RenderWindow *window)
     {
         if (board.getIsGameOver())
         {
-            std::cout << "Game over" << std::endl;
-            std::cout << "Player 0 score: " << board.getScore(0) << std::endl;
-            std::cout << "Player 1 score: " << board.getScore(1) << std::endl;
-            if (board.getScore(0) > board.getScore(1))
-                text.setString("Player One wins!");
-            else if (board.getScore(1) > board.getScore(0))
-                text.setString("Player Two wins!");
-            else
-                text.setString("Tie game!");
-            text.setPosition(sf::Vector2f(300, 300));
-            window->clear();
-            window->draw(boardShape);
-            window->draw(text);
-            window->display();
-            sf::sleep(sf::seconds(10));
+            handleGameOver(board, window, text, boardShape,
+                           "Player One", "Player Two");
             break;
         }
 
@@ -348,6 +305,7 @@ int renderTwoPlayerGame(sf::RenderWindow *window)
 
         window->display();
     }
+
     return 0;
 }
 
@@ -390,4 +348,62 @@ int getPocketIndex(int x, int y)
         return 13;
 
     return -1;
+}
+
+void initializePockets(sf::CircleShape pockets[], int numPockets)
+{
+    for (int i = 0; i < 14; ++i)
+    {
+        pockets[i].setRadius(30.f);
+        pockets[i].setFillColor(sf::Color::White);
+        if (i == 6)
+        { // Player 1's store
+            pockets[i].setPosition(720.f, 250.f);
+        }
+        else if (i == 13)
+        { // Player 0's store
+            pockets[i].setPosition(40.f, 250.f);
+        }
+        else if (i < 6)
+        { // Bottom row
+            pockets[i].setPosition(130.f + i * 100, 300.f);
+        }
+        else if (i < 13)
+        { // Top row
+            pockets[i].setPosition(130.f + (12 - i) * 100, 200.f);
+        }
+    }
+}
+
+void handleGameOver(Board &board, sf::RenderWindow *window, sf::Text &text, sf::RectangleShape &boardShape,
+                    std::string playerOneName, std::string playerTwoName)
+{
+    if (!board.getIsGameOver())
+    {
+        return;
+    }
+
+    std::cout << "Game over" << std::endl;
+    std::cout << "Player 0 score: " << board.getScore(0) << std::endl;
+    std::cout << "Player 1 score: " << board.getScore(1) << std::endl;
+
+    if (board.getScore(0) > board.getScore(1))
+    {
+        text.setString(playerOneName + " wins!");
+    }
+    else if (board.getScore(1) > board.getScore(0))
+    {
+        text.setString(playerTwoName + " wins!");
+    }
+    else
+    {
+        text.setString("Tie game!");
+    }
+
+    text.setPosition(sf::Vector2f(300, 300));
+    window->clear();
+    window->draw(boardShape);
+    window->draw(text);
+    window->display();
+    sf::sleep(sf::seconds(10));
 }
