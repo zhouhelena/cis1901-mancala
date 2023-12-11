@@ -8,14 +8,14 @@
 
 #include "button.hpp"
 
+int getButtonHit(int x, int y);
+
+int renderSinglePlayerGame(sf::RenderWindow *window);
 int getPocketIndex(int x, int y);
-int renderGame(sf::RenderWindow *window);
 
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(820, 600), "Mancala");
-    Board board;
-    Computer computer(1);
 
     sf::Image background;
     if (!(background.loadFromFile("assets/backgroundtexture.jpg")))
@@ -40,8 +40,79 @@ int main()
     sf::Image button;
     if (!(button.loadFromFile("assets/button.png")))
         std::cout << "Error loading image" << std::endl;
-    Button twoPlayerButton(&button, &button, "2 Player", sf::Vector2f{150, 250});
-    Button onePlayerButton(&button, &button, "1 Player", sf::Vector2f{450, 250});
+
+    sf::Texture buttonTexture;
+    buttonTexture.loadFromImage(button);
+    sf::Sprite onePlayerButtonSprite;
+    onePlayerButtonSprite.setTexture(buttonTexture);
+    onePlayerButtonSprite.setPosition(sf::Vector2f{150, 250});
+
+    sf::Sprite twoPlayerButtonSprite;
+    twoPlayerButtonSprite.setTexture(buttonTexture);
+    twoPlayerButtonSprite.setPosition(sf::Vector2f{450, 250});
+
+    sf::Text buttonLabels;
+    buttonLabels.setFont(font);
+    buttonLabels.setFillColor(sf::Color(250, 239, 219));
+    buttonLabels.setString("One Player             Two Players");
+    buttonLabels.setPosition(sf::Vector2f{190, 300});
+    buttonLabels.setCharacterSize(24);
+
+    int buttonHit = -1;
+    while (window.isOpen())
+    {
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed) // handle close event
+                window.close();
+
+            if (event.mouseButton.button == sf::Mouse::Left)
+            {
+                if (buttonHit == -1 && event.type == sf::Event::MouseButtonPressed)
+                    buttonHit = getButtonHit(event.mouseButton.x, event.mouseButton.y);
+            }
+        }
+
+        if (buttonHit != -1)
+            break;
+
+        window.clear();
+        window.draw(bgSprite);
+        window.draw(text);
+
+        window.draw(onePlayerButtonSprite);
+        window.draw(twoPlayerButtonSprite);
+        window.draw(buttonLabels);
+
+        window.display();
+    }
+
+    if (buttonHit == 0)
+    {
+        return renderSinglePlayerGame(&window);
+    }
+    else if (buttonHit == 1)
+    {
+        // simulateGame();
+    }
+
+    return 0;
+}
+
+int getButtonHit(int x, int y)
+{
+    return 0;
+}
+
+int renderSinglePlayerGame(sf::RenderWindow *window)
+{
+    Board board;
+    Computer computer(1);
+
+    sf::RectangleShape boardShape(sf::Vector2f(780, 230));
+    boardShape.setPosition(20, 170);
+    boardShape.setFillColor(sf::Color(139, 69, 19));
 
     sf::CircleShape pockets[14];
     for (int i = 0; i < 14; ++i)
@@ -66,13 +137,13 @@ int main()
         }
     }
 
-    while (window.isOpen())
+    while (window->isOpen())
     {
         sf::Event event;
-        while (window.pollEvent(event))
+        while (window->pollEvent(event))
         {
             if (event.type == sf::Event::Closed) // handle close event
-                window.close();
+                window->close();
 
             if (board.getCurrentPlayer() == 0 && !board.getIsGameOver() && event.type == sf::Event::MouseButtonPressed)
             {
@@ -83,7 +154,6 @@ int main()
                     {
                         board.move(pocketIndex);
                         std::cout << "Picked pocket " << pocketIndex << std::endl;
-                        // TODO: Add code to update GUI
                     }
                 }
             }
@@ -100,14 +170,14 @@ int main()
             }
         }
 
-        window.clear();
+        window->clear();
 
-        window.draw(boardShape);
+        window->draw(boardShape);
         const auto &pocketsWithPebbles = board.getBoard();
 
         for (int i = 0; i < 14; ++i)
         {
-            window.draw(pockets[i]);
+            window->draw(pockets[i]);
 
             sf::Vector2f pocketCenter = pockets[i].getPosition();
             pocketCenter.x += pockets[i].getRadius();
@@ -126,14 +196,13 @@ int main()
 
                 sf::CircleShape pebbleShape = pebble->getShape();
                 pebbleShape.setPosition(pebbleX, pebbleY);
-                window.draw(pebbleShape);
+                window->draw(pebbleShape);
 
                 angle += angleIncrement;
             }
         }
-        window.display();
+        window->display();
     }
-
     return 0;
 }
 
