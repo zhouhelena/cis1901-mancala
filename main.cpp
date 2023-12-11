@@ -5,115 +5,171 @@
 #include <cmath>
 #include <SFML/Graphics.hpp>
 
+#include "button.hpp"
+
 int getPocketIndex(int x, int y);
+int renderGame(sf::RenderWindow *window);
 
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(820, 600), "Mancala");
-    Board board;
 
-    sf::RectangleShape boardShape(sf::Vector2f(780, 230));
-    boardShape.setPosition(20, 170);
-    boardShape.setFillColor(sf::Color(139, 69, 19));
+    sf::Image background;
+    if (!(background.loadFromFile("assets/backgroundtexture.jpg")))
+        std::cout << "Error loading image" << std::endl;
 
-    sf::CircleShape pockets[14];
-    for (int i = 0; i < 14; ++i)
-    {
-        pockets[i].setRadius(30.f);
-        pockets[i].setFillColor(sf::Color::White);
-        if (i == 13)
-        { // Player 1's store
-            pockets[i].setPosition(720.f, 250.f);
-        } else if (i == 6)
-        { // Player 0's store
-            pockets[i].setPosition(40.f, 250.f);
-        }
-        else if (i < 6)
-        { // Bottom row
-            pockets[i].setPosition(130.f + i * 100, 300.f);
-        }
-        else if (i < 13)
-        { // Top row
-            pockets[i].setPosition(130.f + (i - 7) * 100, 200.f);
-        }
-    }
+    sf::Texture texture;
+    texture.loadFromImage(background); // Load Texture from image
+
+    sf::Sprite bgSprite;
+    bgSprite.setTexture(texture);
+
+    sf::Font font;
+    if (!font.loadFromFile("assets/texastango.otf"))
+        std::cout << "Error loading font" << std::endl;
+
+    sf::Text text;
+    text.setFont(font);
+    text.setString("Mancala Game");
+    text.setCharacterSize(56);
+    text.setFillColor(sf::Color::White);
+    text.setPosition(sf::Vector2f{window.getSize() / 4u});
+
+    sf::Image button;
+    if (!(button.loadFromFile("assets/button.png")))
+        std::cout << "Error loading image" << std::endl;
+    Button twoPlayerButton(&button, &button, "2 Player", sf::Vector2f{150, 250});
+    Button onePlayerButton(&button, &button, "1 Player", sf::Vector2f{450, 250});
 
     while (window.isOpen())
     {
         sf::Event event;
         while (window.pollEvent(event))
         {
-            if (event.type == sf::Event::Closed)
+            if (event.type == sf::Event::Closed) // handle close event
                 window.close();
-        
-
-            if (event.type == sf::Event::MouseButtonPressed)
-            {
-                if (event.mouseButton.button == sf::Mouse::Left)
-                {
-                    int pocketIndex = getPocketIndex(event.mouseButton.x, event.mouseButton.y);
-                    if (board.canMove(pocketIndex))
-                    {
-                        board.move(pocketIndex);
-                        std::cout << "Picked pocket " << pocketIndex << std::endl;
-                        // TODO: Add code to update GUI
-                    }
-                }
-            }
         }
 
         window.clear();
+        window.draw(bgSprite);
+        window.draw(text);
 
-        window.draw(boardShape);
-        const auto& pocketsWithPebbles = board.getBoard();
-
-        for (int i = 0; i < 14; ++i)
-        {
-            window.draw(pockets[i]);
-
-            sf::Vector2f pocketPosition = pockets[i].getPosition();
-            pocketCenter.x += pockets[i].getRadius();
-            pocketCenter.y += pockets[i].getRadius();
-
-            // Get pebbles for the current pocket
-            const auto& pebbles = pocketsWithPebbles[i];
-            float angleIncrement = 360.0f / pebbles.size();
-            float angle = 0.0f; 
-
-            for (const auto& pebble : pebbles)
-            {
-                // Set the position of each pebble relative to its pocket's position
-                float radianAngle = angle * 3.14159265f / 180.0f;
-                float distanceFromCenter = 15.0f; // Adjust this to fit within the pocket
-                float pebbleX = pocketCenter.x + distanceFromCenter * cos(radianAngle);
-                float pebbleY = pocketCenter.y + distanceFromCenter * sin(radianAngle);
-
-                sf::CircleShape pebbleShape = pebble->getShape();
-                pebbleShape.setPosition(pebbleX, pebbleY);
-                window.draw(pebbleShape);
-
-                angle += angleIncrement;
-            }
-        }
+        window.draw(onePlayerButton.getLabel());
+        window.draw(twoPlayerButton.getSprite());
         window.display();
     }
+
+    // renderGame(&window);
+
     return 0;
 }
+
+// int renderGame(sf::RenderWindow *window)
+// {
+//     Board board;
+
+//     sf::RectangleShape boardShape(sf::Vector2f(780, 230));
+//     boardShape.setPosition(20, 170);
+//     boardShape.setFillColor(sf::Color(139, 69, 19));
+
+//     sf::CircleShape pockets[14];
+//     for (int i = 0; i < 14; ++i)
+//     {
+//         pockets[i].setRadius(30.f);
+//         pockets[i].setFillColor(sf::Color::White);
+//         if (i == 13)
+//         { // Player 1's store
+//             pockets[i].setPosition(720.f, 250.f);
+//         }
+//         else if (i == 6)
+//         { // Player 0's store
+//             pockets[i].setPosition(40.f, 250.f);
+//         }
+//         else if (i < 6)
+//         { // Bottom row
+//             pockets[i].setPosition(130.f + i * 100, 300.f);
+//         }
+//         else if (i < 13)
+//         { // Top row
+//             pockets[i].setPosition(130.f + (i - 7) * 100, 200.f);
+//         }
+//     }
+
+//     while (window->isOpen())
+//     {
+//         sf::Event event;
+//         while (window->pollEvent(event))
+//         {
+//             if (event.type == sf::Event::Closed)
+//                 window->close();
+
+//             if (event.type == sf::Event::MouseButtonPressed)
+//             {
+//                 if (event.mouseButton.button == sf::Mouse::Left)
+//                 {
+//                     int pocketIndex = getPocketIndex(event.mouseButton.x, event.mouseButton.y);
+//                     if (board.canMove(pocketIndex))
+//                     {
+//                         board.move(pocketIndex);
+//                         std::cout << "Picked pocket " << pocketIndex << std::endl;
+//                         // TODO: Add code to update GUI
+//                     }
+//                 }
+//             }
+//         }
+
+//         window->clear();
+
+//         window->draw(boardShape);
+//         const auto& pocketsWithPebbles = board.getBoard();
+
+//         for (int i = 0; i < 14; ++i)
+//         {
+//             window->draw(pockets[i]);
+
+//             sf::Vector2f pocketPosition = pockets[i].getPosition();
+//             pocketCenter.x += pockets[i].getRadius();
+//             pocketCenter.y += pockets[i].getRadius();
+
+//             // Get pebbles for the current pocket
+//             const auto& pebbles = pocketsWithPebbles[i];
+//             float angleIncrement = 360.0f / pebbles.size();
+//             float angle = 0.0f;
+
+//             for (const auto& pebble : pebbles)
+//             {
+//                 // Set the position of each pebble relative to its pocket's position
+//                 float radianAngle = angle * 3.14159265f / 180.0f;
+//                 float distanceFromCenter = 15.0f; // Adjust this to fit within the pocket
+//                 float pebbleX = pocketCenter.x + distanceFromCenter * cos(radianAngle);
+//                 float pebbleY = pocketCenter.y + distanceFromCenter * sin(radianAngle);
+
+//                 sf::CircleShape pebbleShape = pebble->getShape();
+//                 pebbleShape.setPosition(pebbleX, pebbleY);
+//                 window->draw(pebbleShape);
+
+//                 angle += angleIncrement;
+//             }
+//         }
+//         window->display();
+//     }
+//     return 0;
+// }
 
 int getPocketIndex(int x, int y)
 {
     const float radius = 50.f;
     const float diameter = 2 * radius;
-    sf::Vector2f offset(130.f + radius, 200.f + radius); 
-    sf::Vector2f bottomRowOffset(130.f + radius, 300.f + radius); 
-    sf::Vector2f storeOffset(40.f + radius, 250.f + radius); 
+    sf::Vector2f offset(130.f + radius, 200.f + radius);
+    sf::Vector2f bottomRowOffset(130.f + radius, 300.f + radius);
+    sf::Vector2f storeOffset(40.f + radius, 250.f + radius);
 
     // Check top row (7-12)
     for (int i = 7; i < 13; ++i)
     {
         sf::Vector2f pocketCenter = offset + sf::Vector2f((12 - i) * diameter, 0.f);
         // std::cout << "Checking pocket " << i << " at (" << pocketCenter.x << ", " << pocketCenter.y << ") against click (" << x << ", " << y << ")" << std::endl;
-        if (std::hypot(pocketCenter.x - x, pocketCenter.y - y) <= radius) 
+        if (std::hypot(pocketCenter.x - x, pocketCenter.y - y) <= radius)
         {
             std::cout << "Returned pocket " << i << std::endl;
             return i;
@@ -140,7 +196,7 @@ int getPocketIndex(int x, int y)
     if (std::hypot(player1Store.x - x, player1Store.y - y) <= radius)
         return 13;
 
-    return -1; 
+    return -1;
 }
 
 int simulateGame()
