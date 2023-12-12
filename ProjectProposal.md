@@ -3,7 +3,7 @@
 ### Background
 
 We want to build the board game Mancala. In this game:
-
+ 
 1. One player starts by picking any pocket containing stones from their own side.
 2. The player will remove all the stones from that pocket, and deposit one stone at a time into neighboring pockets going counter-clockwise until the stones run out.
 3. If a player encounters their own store, a stone is deposited in it.
